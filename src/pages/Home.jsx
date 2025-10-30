@@ -8,13 +8,7 @@ const Home = () => {
   const [error,setError] = useState(null);
   const [loading,setLoading] = useState(true);
 
-  // const movies = [
-  //   { id: 1, title: "Jolly LLB 3", release_date: "2025" },
-  //   { id: 2, title: "Caught Stealing", release_date: "2025" },
-  //   { id: 3, title: "Homebound", release_date: "2025" },
-  //   { id: 4, title: "The Smashing Machine", release_date: "2025" },
-  // ];
-
+  
   useEffect(() => {
     const loadPopularMovies = async () => {
       try{
@@ -51,7 +45,8 @@ const Home = () => {
 };
 
   return (
-    <div className="bg-zinc-800 min-h-screen w-full text-white p-6">
+
+    <div className="bg-zinc-900 min-h-screen w-full text-white p-6"> 
 
       {/* Search Box */}
       <form onSubmit={handleSearch} className="flex justify-center mb-8 ">
@@ -64,7 +59,7 @@ const Home = () => {
         />
         <button
           type="submit"
-          className="bg-teal-500 px-4 py-2 rounded-md hover:bg-teal-600 cursor-pointer ml-5"
+          className="bg-amber-500 px-4 py-2 rounded-md hover:bg-amber-600 cursor-pointer ml-5"
         >
           Search
         </button>
