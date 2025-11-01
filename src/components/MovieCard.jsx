@@ -2,12 +2,12 @@ import { useMovieContext } from "../contexts/MovieContext";
 
 function MovieCard({ movie }) {
   const { isFavourite, addToFavourites, removeFromFavourites } = useMovieContext();
-  const favourite = isFavourite(movie.id);
+  const favourite = isFavourite(movie.id); //checking if the movie favourite
 
   const toggleFavourite = () => {
-    if (favourite) {
+    if (favourite) { //if yes-> remove it
       removeFromFavourites(movie.id);
-    } else {
+    } else {  //if no-> add it
       addToFavourites(movie);
     }
   };
@@ -15,7 +15,7 @@ function MovieCard({ movie }) {
   return (
     <div className="p-4 flex flex-col justify-between ml-8 transition-transform duration-300 hover:scale-105">
       {/* Poster */}
-      <div className="relative h-120 w-80 bg-zinc-700 rounded flex items-center justify-center mb-4">
+      <div className="relative h-110 w-80 flex items-center justify-center mb-4">
         <img
           className="h-full w-full object-cover"
           src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -38,9 +38,8 @@ function MovieCard({ movie }) {
       {/* Movie Info */}
       <div>
         <h3 className="text-lg font-semibold mb-1">{movie.title}</h3>
-        <p className="text-sm text-gray-400 mb-2">
-          {movie.release_date?.split("-")[0]}
-        </p>
+        <p className="text-sm text-gray-400 mb-2">{movie.release_date?.split("-")[0]}</p>
+        <p className="text-sm text-amber-400 font-semibold">{movie.vote_average} ⭐</p>
       </div>
     </div>
   );
