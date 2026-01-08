@@ -1,0 +1,48 @@
+import { useMovieContext } from "../contexts/MovieContext";
+
+function MovieCard({ movie }) {
+  const { isFavourite, addToFavourites, removeFromFavourites } = useMovieContext();
+  const favourite = isFavourite(movie.id); //checking if the movie favourite
+
+  const toggleFavourite = () => {
+    if (favourite) { //if yes-> remove it
+      removeFromFavourites(movie.id);
+    } else {  //if no-> add it
+      addToFavourites(movie);
+    }
+  };
+
+  return (
+    <div className="p-4 flex flex-col justify-between ml-8 transition-transform duration-300 hover:scale-105">
+      {/* Poster */}
+      <div className="relative h-110 w-80 flex items-center justify-center mb-4">
+        <img
+          className="h-full w-full object-cover"
+          src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+          alt={movie.title}
+        />
+
+        {/* Heart Icon */}
+        <button
+          className="absolute top-2 right-2 text-2xl cursor-pointer"
+          onClick={toggleFavourite}
+        >
+          <i
+            className={`fa-solid fa-heart transition-colors duration-200 ${
+              favourite ? "text-red-500" : "text-gray-400 hover:text-red-400"
+            }`}
+          ></i>
+        </button>
+      </div>
+
+      {/* Movie Info */}
+      <div>
+        <h3 className="text-lg font-semibold mb-1">{movie.title}</h3>
+        <p className="text-sm text-gray-400 mb-2">{movie.release_date?.split("-")[0]}</p>
+        <p className="text-sm text-amber-400 font-semibold">{movie.vote_average} ⭐</p>
+      </div>
+    </div>
+  );
+}
+
+export default MovieCard;

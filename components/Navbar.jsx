@@ -13,7 +13,7 @@ const Navbar = () => {
         
         {/* Logo */}
         <div className="nav-brand text-2xl font-bold">
-          <Link to="/" onClick={()=> window.location.reload()} className={`${darkMode ? "hover:text-amber-200" : "hover:text-amber-600"} transition-colors duration-200 ml-10`}>
+          <Link to="/" className={`${darkMode ? "hover:text-amber-200" : "hover:text-amber-600"} transition-colors duration-200 ml-10`}>
             🎬 ShowTimeHub
           </Link>
         </div>
@@ -33,8 +33,8 @@ const Navbar = () => {
         </div>
 
         {/* Dark Mode Toggle */}
-        <button onClick={toggleTheme} className="ml-4 text-xl cursor-pointer" title="Toggle Dark/Light Mode">
-          {darkMode ?<i className="fa-solid fa-toggle-on"></i> : <i className="fa-solid fa-toggle-off"></i>}
+        <button onClick={toggleTheme} className="ml-4 text-xl" title="Toggle Dark/Light Mode">
+          {darkMode ? "🌙" : "☀️"}
         </button>
 
         {/* Links */}
