@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import MovieCard from "../components/MovieCard";
-import { getPopularmovies, searchMovies, getMovieTrailer } from "../services/api";
+import {
+  getPopularmovies,
+  searchMovies,
+  getMovieTrailer,
+} from "../services/api";
 import { useMovieContext } from "../contexts/MovieContext";
 import { useTheme } from "../contexts/ThemeContext";
 
@@ -16,8 +20,20 @@ const Home = () => {
   const [trailer, setTrailer] = useState(null);
   const [showTrailer, setShowTrailer] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [heroIndex, setHeroIndex] = useState(0); // 
 
-  // Load popular movies
+  useEffect(() => {   //
+    if (movies.length === 0) return;
+
+    const interval = setInterval(() => {
+      setHeroIndex((prev) => (prev + 1) % Math.min(movies.length, 5));
+    }, 6000); // change every 6 seconds
+
+    return () => clearInterval(interval);
+  }, [movies]);
+
+
+
   useEffect(() => {
     const loadPopularMovies = async () => {
       try {
@@ -32,7 +48,6 @@ const Home = () => {
     loadPopularMovies();
   }, []);
 
-  // Trailer
   useEffect(() => {
     if (!selectedMovie) return;
 
@@ -48,7 +63,6 @@ const Home = () => {
     fetchTrailer();
   }, [selectedMovie]);
 
-  // Search movies
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
@@ -66,7 +80,7 @@ const Home = () => {
     }
   };
 
-  // Clear search
+
   const clearSearch = async () => {
     setSearchQuery("");
     setIsSearching(false);
@@ -77,7 +91,6 @@ const Home = () => {
     setLoading(false);
   };
 
-  // Filtering logic
   const filteredMovies = movies.filter((movie) => {
     if (filter === "All") return true;
     if (filter === "Top Rated") return movie.vote_average >= 8;
@@ -99,25 +112,106 @@ const Home = () => {
 
   return (
     <div
-      className={`min-h-screen w-full p-4 sm:p-6 relative transition-colors duration-300 ${
-        darkMode ? "bg-zinc-900 text-white" : "bg-white text-black"
-      }`}
+      className={`min-h-screen w-full p-4 sm:p-6 relative overflow-hidden transition-colors duration-300 ${darkMode ? "bg-zinc-900 text-white" : "bg-white text-black"
+        }`}
     >
-      {/* Search Box */}
+      {/* Background Glow */}
+      <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-amber-500/20 rounded-full blur-[120px]" />
+      <div className="absolute top-1/3 -right-40 w-[400px] h-[400px] bg-purple-500/20 rounded-full blur-[120px]" />
+
+
+      {/* Auto-Changing Hero Banner */}
+      {movies.length > 0 && !isSearching && (
+        <motion.div
+          key={heroIndex}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          className="relative w-full h-[60vh] sm:h-[70vh] rounded-3xl overflow-hidden mb-12 shadow-2xl"
+        >
+          {/* Background Image */}
+          <img
+            src={`https://image.tmdb.org/t/p/original${movies[heroIndex].backdrop_path}`}
+            alt={movies[heroIndex].title}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+
+          {/* Overlay (Dark / Light mode aware) */}
+          <div
+            className={`absolute inset-0 ${darkMode
+                ? "bg-gradient-to-r from-black via-black/70 to-transparent"
+                : "bg-gradient-to-r from-white via-white/80 to-transparent"
+              }`}
+          />
+
+          {/* Content */}
+          <div className="relative z-10 h-full flex flex-col justify-end p-6 sm:p-10 max-w-2xl">
+            <h1
+              className={`text-3xl sm:text-5xl font-extrabold mb-3 ${darkMode ? "text-white" : "text-black"
+                }`}
+            >
+              {movies[heroIndex].title}
+            </h1>
+
+            <p
+              className={`text-sm sm:text-base line-clamp-3 mb-5 ${darkMode ? "text-gray-300" : "text-gray-700"
+                }`}
+            >
+              {movies[heroIndex].overview}
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setSelectedMovie(movies[heroIndex])}
+                className="bg-amber-500 hover:bg-amber-600 text-black px-6 py-3 rounded-xl font-semibold"
+              >
+                ▶ Watch
+              </button>
+
+              <button
+                className={`px-6 py-3 rounded-xl border transition ${darkMode
+                    ? "border-white/30 hover:bg-white/10 text-white"
+                    : "border-black/20 hover:bg-black/5 text-black"
+                  }`}
+              >
+                + My List
+              </button>
+            </div>
+          </div>
+
+          {/* Progress Indicators */}
+          <div className="absolute bottom-4 right-6 flex gap-2">
+            {movies.slice(0, 5).map((_, index) => (
+              <div
+                key={index}
+                className={`h-1 w-6 rounded-full transition ${index === heroIndex
+                    ? "bg-amber-500"
+                    : darkMode
+                      ? "bg-white/30"
+                      : "bg-black/30"
+                  }`}
+              />
+            ))}
+          </div>
+        </motion.div>
+      )}
+
+
+      {/* Search */}
       <form
         onSubmit={handleSearch}
-        className="flex flex-col sm:flex-row justify-center items-center gap-2 mb-8"
+        className="relative z-10 flex flex-col sm:flex-row justify-center items-center gap-3 mb-10 backdrop-blur-xl bg-white/5 p-4 rounded-2xl shadow-lg"
       >
         <input
-          className="px-4 py-2 rounded-xl text-white w-full sm:w-96 placeholder-zinc-400 bg-zinc-700"
+          className="px-4 py-3 rounded-xl w-full sm:w-96 bg-zinc-800/70 border border-white/10 placeholder-zinc-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 outline-none transition"
           type="text"
-          placeholder="Search for movies..."
+          placeholder="Search movies, actors, genres..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
         <button
           type="submit"
-          className="bg-amber-500 px-4 py-2 rounded-xl hover:bg-amber-600 w-full sm:w-auto"
+          className="bg-gradient-to-r from-amber-400 to-amber-600 px-6 py-3 rounded-xl font-semibold shadow-lg hover:scale-105 active:scale-95 transition w-full sm:w-auto"
         >
           Search
         </button>
@@ -125,89 +219,88 @@ const Home = () => {
 
       {error && <div className="text-center text-red-400">{error}</div>}
 
-      {/* Movies Grid */}
+      {/* Movies */}
       {loading ? (
-        <div className="text-center mt-10">Loading...</div>
+        <div className="flex justify-center items-center mt-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-amber-500"></div>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {filteredMovies.map((movie) => (
-            <div
+            <motion.div
               key={movie.id}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 300 }}
               onClick={() => setSelectedMovie(movie)}
               className="cursor-pointer"
             >
               <MovieCard movie={movie} />
-            </div>
+            </motion.div>
           ))}
         </div>
       )}
 
-      {/* Popup */}
+      {/* Movie Modal */}
       {selectedMovie && (
         <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-2"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setSelectedMovie(null);
-          }}
+          className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-2"
+          onClick={(e) =>
+            e.target === e.currentTarget && setSelectedMovie(null)
+          }
         >
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35 }}
-            className="relative w-full max-w-4xl bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl p-4 md:p-6"
+            transition={{ duration: 0.4 }}
+            className="relative w-full max-w-4xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 rounded-3xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.7)] p-4 md:p-6 border border-white/10"
           >
-            {/* Close Button */}
             <button
               onClick={() => setSelectedMovie(null)}
-              className="absolute top-4 right-4 text-white/70 hover:text-white text-2xl z-10"
+              className="absolute top-4 right-4 text-white/60 hover:text-white text-2xl"
             >
               ✕
             </button>
 
-            <div className="flex flex-col md:flex-row gap-4">
-              {/* Poster */}
+            <div className="flex flex-col md:flex-row gap-6">
               <div className="md:w-1/3">
                 <img
                   src={`https://image.tmdb.org/t/p/w500${selectedMovie.poster_path}`}
                   alt={selectedMovie.title}
-                  className="w-full h-auto object-cover rounded-lg"
+                  className="w-full rounded-xl shadow-lg"
                 />
               </div>
 
-              {/* Content */}
               <div className="md:w-2/3 flex flex-col justify-between">
                 <div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+                  <h2 className="text-3xl font-bold mb-2">
                     {selectedMovie.title}
                   </h2>
 
-                  {/* Info */}
-                  <div className="flex flex-wrap items-center gap-4 text-sm sm:text-base text-gray-400 mb-4">
+                  <div className="flex gap-4 text-sm text-gray-400 mb-4">
                     <span>{selectedMovie.release_date?.split("-")[0]}</span>
-                    <span className="text-amber-400 font-semibold">
+                    <span className="text-amber-400">
                       ⭐ {selectedMovie.vote_average}
                     </span>
                     <span>🔥 {Math.round(selectedMovie.popularity)}</span>
                   </div>
 
-                  {/* Overview */}
                   <p className="text-gray-300 leading-relaxed">
                     {selectedMovie.overview || "No description available."}
                   </p>
                 </div>
 
-                {/* Buttons */}
-                <div className="mt-6 flex flex-col sm:flex-row gap-2">
+                <div className="mt-6 flex flex-col sm:flex-row gap-3">
                   {trailer && (
                     <button
                       onClick={() => setShowTrailer(true)}
-                      className="bg-amber-500 hover:bg-amber-600 text-black px-5 py-2 rounded-lg font-semibold w-full sm:w-auto"
+                      className="bg-gradient-to-r from-amber-400 to-amber-600 px-6 py-3 rounded-xl font-bold hover:scale-105 transition"
                     >
                       ▶ Watch Trailer
                     </button>
                   )}
 
-                  <button className="border border-white/30 hover:border-white px-5 py-2 rounded-lg text-white w-full sm:w-auto">
+                  <button className="border border-white/20 px-6 py-3 rounded-xl hover:bg-white/10 transition">
                     Add to Favourites
                   </button>
                 </div>
@@ -217,21 +310,22 @@ const Home = () => {
         </div>
       )}
 
+      {/* Trailer */}
       {showTrailer && trailer && (
         <div
-          className="fixed inset-0 bg-black/80 flex items-center justify-center z-[60] p-2"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setShowTrailer(false);
-          }}
+          className="fixed inset-0 bg-black/90 flex items-center justify-center z-[60]"
+          onClick={(e) =>
+            e.target === e.currentTarget && setShowTrailer(false)
+          }
         >
-          <div className="w-full sm:w-[90%] max-w-4xl aspect-video">
+          <div className="w-full sm:w-[90%] max-w-4xl aspect-video rounded-2xl overflow-hidden shadow-2xl">
             <iframe
               src={`https://www.youtube.com/embed/${trailer.key}?autoplay=1`}
               title="Movie Trailer"
-              className="w-full h-full rounded-xl"
+              className="w-full h-full"
               allow="autoplay; encrypted-media"
               allowFullScreen
-            ></iframe>
+            />
           </div>
         </div>
       )}
@@ -240,3 +334,4 @@ const Home = () => {
 };
 
 export default Home;
+
