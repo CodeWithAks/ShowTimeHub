@@ -30,8 +30,7 @@ const Navbar = () => {
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                className="bg-transparent outline-none px-2 py-1 cursor-pointer"
-              >
+                className="bg-transparent outline-none px-2 py-1 cursor-pointer" >
                 <option value="All">All</option>
                 <option value="Top Rated">Top Rated</option>
                 <option value="Action">Action</option>

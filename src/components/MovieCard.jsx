@@ -13,9 +13,9 @@ function MovieCard({ movie }) {
   };
 
   return (
-    <div className="p-4 flex flex-col justify-between ml-8 transition-transform duration-300 hover:scale-105">
+    <div className="p-2 sm:p-3 md:p-4 flex flex-col justify-between transition-transform duration-300 hover:scale-105">
       {/* Poster */}
-      <div className="relative h-110 w-80 flex items-center justify-center mb-4">
+      <div className="relative w-full aspect-[2/3] flex items-center justify-center mb-4">
         <img
           className="h-full w-full object-cover"
           src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -24,7 +24,7 @@ function MovieCard({ movie }) {
 
         {/* Heart Icon */}
         <button
-          className="absolute top-2 right-2 text-2xl cursor-pointer"
+          className="absolute top-1 right-1 sm:top-2 sm:right-2 p-2 rounded-lg hover:bg-white/10 transition text-lg sm:text-2xl cursor-pointer"
           onClick={toggleFavourite}
         >
           <i
@@ -38,8 +38,8 @@ function MovieCard({ movie }) {
       {/* Movie Info */}
       <div>
         <h3 className="text-lg font-semibold mb-1">{movie.title}</h3>
-        <p className="text-sm text-gray-400 mb-2">{movie.release_date?.split("-")[0]}</p>
-        <p className="text-sm text-amber-400 font-semibold">{movie.vote_average} ⭐</p>
+        <p className="text-xs sm:text-sm text-gray-400 mb-2">{movie.release_date?.split("-")[0]}</p>
+        <p className="text-xs sm:text-sm text-amber-400 font-semibold">{movie.vote_average} ⭐</p>
       </div>
     </div>
   );

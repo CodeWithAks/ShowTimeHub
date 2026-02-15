@@ -12,7 +12,7 @@ const Favourites = () => {
       className={`min-h-screen relative overflow-hidden p-4 sm:p-6 transition-colors duration-300 ${
         darkMode ? "bg-zinc-900 text-white" : "bg-white text-black"
       }`}
-    >
+      >
       {/* Subtle background glow */}
       <div className="absolute -top-40 -left-40 w-[400px] h-[400px] bg-amber-500/20 rounded-full blur-[120px]" />
       <div className="absolute top-1/2 -right-40 w-[350px] h-[350px] bg-purple-500/20 rounded-full blur-[120px]" />

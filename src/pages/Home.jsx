@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import MovieCard from "../components/MovieCard";
-import {
-  getPopularmovies,
-  searchMovies,
-  getMovieTrailer,
-} from "../services/api";
+import { getPopularmovies,searchMovies,getMovieTrailer,} from "../services/api";
 import { useMovieContext } from "../contexts/MovieContext";
 import { useTheme } from "../contexts/ThemeContext";
 
@@ -20,7 +16,7 @@ const Home = () => {
   const [trailer, setTrailer] = useState(null);
   const [showTrailer, setShowTrailer] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-  const [heroIndex, setHeroIndex] = useState(0); // 
+  const [heroIndex, setHeroIndex] = useState(0); 
 
   useEffect(() => {   //
     if (movies.length === 0) return;
@@ -139,8 +135,8 @@ const Home = () => {
           {/* Overlay (Dark / Light mode aware) */}
           <div
             className={`absolute inset-0 ${darkMode
-                ? "bg-gradient-to-r from-black via-black/70 to-transparent"
-                : "bg-gradient-to-r from-white via-white/80 to-transparent"
+                ? "bg-gradient-to-r from-black via-black/60 to-transparent"
+                : "bg-gradient-to-r from-white via-white/10 to-transparent"
               }`}
           />
 
@@ -163,8 +159,7 @@ const Home = () => {
             <div className="flex gap-3">
               <button
                 onClick={() => setSelectedMovie(movies[heroIndex])}
-                className="bg-amber-500 hover:bg-amber-600 text-black px-6 py-3 rounded-xl font-semibold"
-              >
+                className="bg-amber-500 hover:bg-amber-600 text-black px-6 py-3 rounded-xl font-semibold">
                 ▶ Watch
               </button>
 
@@ -172,8 +167,7 @@ const Home = () => {
                 className={`px-6 py-3 rounded-xl border transition ${darkMode
                     ? "border-white/30 hover:bg-white/10 text-white"
                     : "border-black/20 hover:bg-black/5 text-black"
-                  }`}
-              >
+                  }`}>
                 + My List
               </button>
             </div>
@@ -184,13 +178,7 @@ const Home = () => {
             {movies.slice(0, 5).map((_, index) => (
               <div
                 key={index}
-                className={`h-1 w-6 rounded-full transition ${index === heroIndex
-                    ? "bg-amber-500"
-                    : darkMode
-                      ? "bg-white/30"
-                      : "bg-black/30"
-                  }`}
-              />
+                className={`h-1 w-6 rounded-full transition ${index === heroIndex ? "bg-amber-500" : darkMode ? "bg-white/30" : "bg-black/30" }`}/>
             ))}
           </div>
         </motion.div>
@@ -200,19 +188,16 @@ const Home = () => {
       {/* Search */}
       <form
         onSubmit={handleSearch}
-        className="relative z-10 flex flex-col sm:flex-row justify-center items-center gap-3 mb-10 backdrop-blur-xl bg-white/5 p-4 rounded-2xl shadow-lg"
-      >
+        className="relative z-10 flex flex-col sm:flex-row justify-center items-center gap-3 mb-10 backdrop-blur-xl bg-white/5 p-4 rounded-2xl shadow-lg">
         <input
           className="px-4 py-3 rounded-xl w-full sm:w-96 bg-zinc-800/70 border border-white/10 placeholder-zinc-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 outline-none transition"
           type="text"
           placeholder="Search movies, actors, genres..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        <button
-          type="submit"
-          className="bg-gradient-to-r from-amber-400 to-amber-600 px-6 py-3 rounded-xl font-semibold shadow-lg hover:scale-105 active:scale-95 transition w-full sm:w-auto"
-        >
+          onChange={(e) => setSearchQuery(e.target.value)}/>
+
+
+        <button type="submit" className="bg-gradient-to-r from-amber-400 to-amber-600 px-6 py-3 rounded-xl font-semibold shadow-lg hover:scale-105 active:scale-95 transition w-full sm:w-auto" >
           Search
         </button>
       </form>
@@ -294,8 +279,7 @@ const Home = () => {
                   {trailer && (
                     <button
                       onClick={() => setShowTrailer(true)}
-                      className="bg-gradient-to-r from-amber-400 to-amber-600 px-6 py-3 rounded-xl font-bold hover:scale-105 transition"
-                    >
+                      className="bg-gradient-to-r from-amber-400 to-amber-600 px-6 py-3 rounded-xl font-bold hover:scale-105 transition" >
                       ▶ Watch Trailer
                     </button>
                   )}
@@ -316,8 +300,8 @@ const Home = () => {
           className="fixed inset-0 bg-black/90 flex items-center justify-center z-[60]"
           onClick={(e) =>
             e.target === e.currentTarget && setShowTrailer(false)
-          }
-        >
+          } >
+            
           <div className="w-full sm:w-[90%] max-w-4xl aspect-video rounded-2xl overflow-hidden shadow-2xl">
             <iframe
               src={`https://www.youtube.com/embed/${trailer.key}?autoplay=1`}
