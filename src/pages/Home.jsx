@@ -4,6 +4,8 @@ import MovieCard from "../components/MovieCard";
 import { getPopularmovies,searchMovies,getMovieTrailer,} from "../services/api";
 import { useMovieContext } from "../contexts/MovieContext";
 import { useTheme } from "../contexts/ThemeContext";
+import SkeletonCard from "../components/SkeletonCards.jsx";
+import  {useNavigate} from "react-router-dom";
 
 const Home = () => {
   const { darkMode } = useTheme();
@@ -18,6 +20,9 @@ const Home = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [heroIndex, setHeroIndex] = useState(0); 
 
+  const navigate = useNavigate();
+
+  //banner
   useEffect(() => {   //
     if (movies.length === 0) return;
 
@@ -28,7 +33,16 @@ const Home = () => {
     return () => clearInterval(interval);
   }, [movies]);
 
+  //debounced search
+  useEffect(() => {
+  const timeout = setTimeout(() => {
+    if (searchQuery.trim()) {
+      handleSearch();
+    }
+  }, 500);
 
+  return () => clearTimeout(timeout);
+}, [searchQuery]);
 
   useEffect(() => {
     const loadPopularMovies = async () => {
@@ -89,7 +103,7 @@ const Home = () => {
 
   const filteredMovies = movies.filter((movie) => {
     if (filter === "All") return true;
-    if (filter === "Top Rated") return movie.vote_average >= 8;
+    if (filter === "Top Rated") return parseFloat(movie.vote_average.toFixed(1)) >= 8;
 
     const genreMap = {
       Action: 28,
@@ -116,7 +130,7 @@ const Home = () => {
       <div className="absolute top-1/3 -right-40 w-[400px] h-[400px] bg-purple-500/20 rounded-full blur-[120px]" />
 
 
-      {/* Auto-Changing Hero Banner */}
+      {/* Hero Banner */}
       {movies.length > 0 && !isSearching && (
         <motion.div
           key={heroIndex}
@@ -125,18 +139,18 @@ const Home = () => {
           transition={{ duration: 0.8 }}
           className="relative w-full h-[60vh] sm:h-[70vh] rounded-3xl overflow-hidden mb-12 shadow-2xl"
         >
-          {/* Background Image */}
+          {/* Bg image */}
           <img
             src={`https://image.tmdb.org/t/p/original${movies[heroIndex].backdrop_path}`}
             alt={movies[heroIndex].title}
             className="absolute inset-0 w-full h-full object-cover"
           />
 
-          {/* Overlay (Dark / Light mode aware) */}
+          {/* Dark/Light mode */}
           <div
             className={`absolute inset-0 ${darkMode
                 ? "bg-gradient-to-r from-black via-black/60 to-transparent"
-                : "bg-gradient-to-r from-white via-white/10 to-transparent"
+                : "bg-gradient-to-r from-white via-white/5 to-transparent"
               }`}
           />
 
@@ -185,7 +199,7 @@ const Home = () => {
       )}
 
 
-      {/* Search */}
+      {/* Search Bar*/}
       <form
         onSubmit={handleSearch}
         className="relative z-10 flex flex-col sm:flex-row justify-center items-center gap-3 mb-10 backdrop-blur-xl bg-white/5 p-4 rounded-2xl shadow-lg">
@@ -206,9 +220,11 @@ const Home = () => {
 
       {/* Movies */}
       {loading ? (
-        <div className="flex justify-center items-center mt-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-amber-500"></div>
-        </div>
+        <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+  {Array.from({ length: 10 }).map((_, index) => (
+    <SkeletonCard key={index} />
+  ))}
+</div>
       ) : (
         <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {filteredMovies.map((movie) => (
@@ -217,100 +233,13 @@ const Home = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.97 }}
               transition={{ type: "spring", stiffness: 300 }}
-              onClick={() => setSelectedMovie(movie)}
+              // onClick={() => setSelectedMovie(movie)}
+              onClick={() => navigate(`/movie/${movie.id}`)}
               className="cursor-pointer"
             >
               <MovieCard movie={movie} />
             </motion.div>
           ))}
-        </div>
-      )}
-
-      {/* Movie Modal */}
-      {selectedMovie && (
-        <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-2"
-          onClick={(e) =>
-            e.target === e.currentTarget && setSelectedMovie(null)
-          }
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="relative w-full max-w-4xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 rounded-3xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.7)] p-4 md:p-6 border border-white/10"
-          >
-            <button
-              onClick={() => setSelectedMovie(null)}
-              className="absolute top-4 right-4 text-white/60 hover:text-white text-2xl"
-            >
-              ✕
-            </button>
-
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="md:w-1/3">
-                <img
-                  src={`https://image.tmdb.org/t/p/w500${selectedMovie.poster_path}`}
-                  alt={selectedMovie.title}
-                  className="w-full rounded-xl shadow-lg"
-                />
-              </div>
-
-              <div className="md:w-2/3 flex flex-col justify-between">
-                <div>
-                  <h2 className="text-3xl font-bold mb-2">
-                    {selectedMovie.title}
-                  </h2>
-
-                  <div className="flex gap-4 text-sm text-gray-400 mb-4">
-                    <span>{selectedMovie.release_date?.split("-")[0]}</span>
-                    <span className="text-amber-400">
-                      ⭐ {selectedMovie.vote_average}
-                    </span>
-                    <span>🔥 {Math.round(selectedMovie.popularity)}</span>
-                  </div>
-
-                  <p className="text-gray-300 leading-relaxed">
-                    {selectedMovie.overview || "No description available."}
-                  </p>
-                </div>
-
-                <div className="mt-6 flex flex-col sm:flex-row gap-3">
-                  {trailer && (
-                    <button
-                      onClick={() => setShowTrailer(true)}
-                      className="bg-gradient-to-r from-amber-400 to-amber-600 px-6 py-3 rounded-xl font-bold hover:scale-105 transition" >
-                      ▶ Watch Trailer
-                    </button>
-                  )}
-
-                  <button className="border border-white/20 px-6 py-3 rounded-xl hover:bg-white/10 transition">
-                    Add to Favourites
-                  </button>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      )}
-
-      {/* Trailer */}
-      {showTrailer && trailer && (
-        <div
-          className="fixed inset-0 bg-black/90 flex items-center justify-center z-[60]"
-          onClick={(e) =>
-            e.target === e.currentTarget && setShowTrailer(false)
-          } >
-            
-          <div className="w-full sm:w-[90%] max-w-4xl aspect-video rounded-2xl overflow-hidden shadow-2xl">
-            <iframe
-              src={`https://www.youtube.com/embed/${trailer.key}?autoplay=1`}
-              title="Movie Trailer"
-              className="w-full h-full"
-              allow="autoplay; encrypted-media"
-              allowFullScreen
-            />
-          </div>
         </div>
       )}
     </div>

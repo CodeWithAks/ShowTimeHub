@@ -17,14 +17,37 @@ export const searchMovies = async (query) => {
   return data.results;
 };
 
-export const getMovieTrailer = async (movieId) => {
+// export const getMovieTrailer = async (movieId) => {
+//   const res = await fetch(
+//     `${BASE_URL}/movie/${movieId}/videos?api_key=${API_KEY}`
+//   );
+//   const data = await res.json();
+
+//   return data.results.find(
+//     (video) =>
+//       video.type === "Trailer" && video.site === "YouTube"
+//   );
+// };
+export const getMovieTrailer = async (id) => {
+  const response = await fetch(
+    `https://api.themoviedb.org/3/movie/${id}/videos?api_key=${API_KEY}`
+  );
+
+  const data = await response.json();
+
+  const trailer = data.results.find(
+    (video) =>
+      video.type === "Trailer" &&
+      video.site === "YouTube"
+  );
+
+  return trailer ? trailer.key : null;
+};
+
+export const getMovieDetails = async (movieId) => {
   const res = await fetch(
-    `${BASE_URL}/movie/${movieId}/videos?api_key=${API_KEY}`
+    `${BASE_URL}/movie/${movieId}?api_key=${API_KEY}`
   );
   const data = await res.json();
-
-  return data.results.find(
-    (video) =>
-      video.type === "Trailer" && video.site === "YouTube"
-  );
-};
+  return data;
+}; 

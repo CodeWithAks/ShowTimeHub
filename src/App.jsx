@@ -4,6 +4,7 @@ import Favourites from './pages/Favourites';
 import Navbar from './components/Navbar';
 import { MovieProvider } from './contexts/MovieContext';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
+import MovieDetails from "./pages/MovieDetails";
 
 function AppWrapper() {
   const { darkMode } = useTheme(); // to take darkMode state
@@ -14,6 +15,7 @@ function AppWrapper() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/favourites" element={<Favourites />} />
+        <Route path="/movie/:id" element={<MovieDetails />} />
       </Routes>
     </div>
   );
