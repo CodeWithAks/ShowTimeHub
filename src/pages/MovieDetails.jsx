@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getMovieDetails, getMovieTrailer } from "../services/api";
 import { useTheme } from "../contexts/ThemeContext";
 
+
 const MovieDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -11,6 +12,34 @@ const MovieDetails = () => {
   const [loading, setLoading] = useState(true);
   const [showTrailer, setShowTrailer] = useState(false);
   const { darkMode } = useTheme();
+  const [coped, setCoped] = useState(false);
+
+  const handleShare = async () => {
+    if (!movie) return;
+
+    const shareData = {
+      title: movie.title,
+      text: `Check out ${movie.title}!`,
+      url: window.location.href,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        console.log("Share cancelled");
+      }
+    } else {
+      // fallback: copy link
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+
+    }
+  };
 
   useEffect(() => {
     const fetchMovie = async () => {
@@ -46,12 +75,11 @@ const MovieDetails = () => {
     );
   }
 
-return (
-      <div
-  className={`min-h-screen transition-colors duration-300 ${
-    darkMode ? "bg-zinc-900 text-white" : "bg-white text-black"
-  }`}
->
+  return (
+    <div
+      className={`min-h-screen transition-colors duration-300 ${darkMode ? "bg-zinc-900 text-white" : "bg-white text-black"
+        }`}
+    >
       {/* Back Button */}
       <div className="p-6">
         <button
@@ -63,7 +91,7 @@ return (
       </div>
 
       <div className="max-w-6xl mx-auto px-6 pb-10 grid md:grid-cols-2 gap-8">
-        
+
         {/* Poster */}
         {movie.poster_path && (
           <img
@@ -85,14 +113,31 @@ return (
             {movie.overview}
           </p>
 
-          {trailer && (
+          {/* {trailer && (
             <button
               onClick={() => setShowTrailer(!showTrailer)}
               className="mb-6 px-6 py-2 bg-red-600 hover:bg-red-700 rounded font-semibold transition"
             >
               {showTrailer ? "Hide Trailer" : "Watch Trailer"}
             </button>
-          )}
+          )} */}
+          <div className="flex gap-4 mb-6">
+            {trailer && (
+              <button
+                onClick={() => setShowTrailer(!showTrailer)}
+                className="px-6 py-2 bg-red-600 hover:bg-red-700 rounded font-semibold transition"
+              >
+                {showTrailer ? "Hide Trailer" : "Watch Trailer"}
+              </button>
+            )}
+
+            <button
+              onClick={handleShare}
+              className="px-6 py-2 bg-amber-500 hover:bg-amber-600 text-black rounded font-semibold transition"
+            >
+              Share
+            </button>
+          </div>
 
           <p className="text-sm text-gray-400">
             Release Date: {movie.release_date}
@@ -114,9 +159,16 @@ return (
           </div>
         </div>
       )}
-      
+
+{copied && (
+  <div className="fixed bottom-6 right-6 bg-black text-white px-4 py-2 rounded-lg shadow-lg">
+    Link copied!
+  </div>
+)}
+
     </div>
-)
+  )
+  
 };
 
 export default MovieDetails;
