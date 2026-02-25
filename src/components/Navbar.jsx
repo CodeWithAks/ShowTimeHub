@@ -25,18 +25,22 @@ const Navbar = () => {
 
           {/* Desktop Controls (Hidden on Mobile) */}
           <div className="hidden md:flex items-center space-x-8">
+
             {/* Dropdown */}
-            <div className={`rounded-md px-1 py-1 ${darkMode ? "bg-zinc-700" : "bg-gray-100"}`}>
-              <select
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                className="bg-transparent outline-none px-2 py-1 cursor-pointer" >
-                <option value="All">All</option>
-                <option value="Top Rated">Top Rated</option>
-                <option value="Action">Action</option>
-                <option value="Comedy">Comedy</option>
-              </select>
-            </div>
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className={`rounded-md px-3 py-2 outline-none cursor-pointer transition-colors duration-200 ${
+                darkMode
+                  ? "bg-zinc-700 text-white"
+                  : "bg-gray-100 text-black border border-gray-300"
+              }`}
+            >
+              <option value="All">All</option>
+              <option value="Top Rated">Top Rated</option>
+              <option value="Action">Action</option>
+              <option value="Comedy">Comedy</option>
+            </select>
 
             <Link to="/" className={`${hoverColor} transition-colors`}>Home</Link>
             <Link to="/favourites" className={`${hoverColor} transition-colors`}>Favourites</Link>
@@ -70,14 +74,18 @@ const Navbar = () => {
           <div className="pt-2">
             <p className="text-xs uppercase mb-2 opacity-50">Filter by Genre</p>
             <select
-                value={filter}
-                onChange={(e) => { setFilter(e.target.value); setIsMenuOpen(false); }}
-                className={`w-full p-2 rounded ${darkMode ? "bg-zinc-700" : "bg-white border"}`}
-              >
-                <option value="All">All</option>
-                <option value="Top Rated">Top Rated</option>
-                <option value="Action">Action</option>
-                <option value="Comedy">Comedy</option>
+              value={filter}
+              onChange={(e) => { setFilter(e.target.value); setIsMenuOpen(false); }}
+              className={`w-full p-2 rounded outline-none cursor-pointer transition-colors duration-200 ${
+                darkMode
+                  ? "bg-zinc-700 text-white"
+                  : "bg-gray-100 text-black border border-gray-300"
+              }`}
+            >
+              <option value="All">All</option>
+              <option value="Top Rated">Top Rated</option>
+              <option value="Action">Action</option>
+              <option value="Comedy">Comedy</option>
             </select>
           </div>
         </div>

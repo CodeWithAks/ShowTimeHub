@@ -17,17 +17,7 @@ export const searchMovies = async (query) => {
   return data.results;
 };
 
-// export const getMovieTrailer = async (movieId) => {
-//   const res = await fetch(
-//     `${BASE_URL}/movie/${movieId}/videos?api_key=${API_KEY}`
-//   );
-//   const data = await res.json();
-
-//   return data.results.find(
-//     (video) =>
-//       video.type === "Trailer" && video.site === "YouTube"
-//   );
-// };
+  
 export const getMovieTrailer = async (id) => {
   const response = await fetch(
     `https://api.themoviedb.org/3/movie/${id}/videos?api_key=${API_KEY}`
@@ -50,4 +40,20 @@ export const getMovieDetails = async (movieId) => {
   );
   const data = await res.json();
   return data;
+};
+
+export const getTopRatedMovies = async () => {
+  const response = await fetch(
+    `${BASE_URL}/movie/top_rated?api_key=${API_KEY}`
+  );
+  const data = await response.json();
+  return data.results;
+};
+
+export const getMoviesByGenre = async (genreId) => {
+  const response = await fetch(
+    `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&sort_by=popularity.desc`
+  );
+  const data = await response.json();
+  return data.results;
 }; 

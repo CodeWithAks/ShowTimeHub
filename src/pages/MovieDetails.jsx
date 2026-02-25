@@ -12,7 +12,7 @@ const MovieDetails = () => {
   const [loading, setLoading] = useState(true);
   const [showTrailer, setShowTrailer] = useState(false);
   const { darkMode } = useTheme();
-  const [coped, setCoped] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const handleShare = async () => {
     if (!movie) return;
@@ -84,11 +84,15 @@ const MovieDetails = () => {
       <div className="p-6">
         <button
           onClick={() => navigate(-1)}
-          className="px-4 py-2 bg-zinc-800 rounded hover:bg-zinc-700 transition"
+          className={`px-4 py-2 rounded transition ${darkMode
+            ? "bg-zinc-800 hover:bg-zinc-700 text-white"
+            : "bg-gray-200 hover:bg-gray-300 text-black"
+            }`}
         >
           ← Back
         </button>
       </div>
+
 
       <div className="max-w-6xl mx-auto px-6 pb-10 grid md:grid-cols-2 gap-8">
 
@@ -113,21 +117,20 @@ const MovieDetails = () => {
             {movie.overview}
           </p>
 
-          {/* {trailer && (
-            <button
-              onClick={() => setShowTrailer(!showTrailer)}
-              className="mb-6 px-6 py-2 bg-red-600 hover:bg-red-700 rounded font-semibold transition"
-            >
-              {showTrailer ? "Hide Trailer" : "Watch Trailer"}
-            </button>
-          )} */}
           <div className="flex gap-4 mb-6">
-            {trailer && (
+            {trailer ? (
               <button
                 onClick={() => setShowTrailer(!showTrailer)}
                 className="px-6 py-2 bg-red-600 hover:bg-red-700 rounded font-semibold transition"
               >
                 {showTrailer ? "Hide Trailer" : "Watch Trailer"}
+              </button>
+            ) : (
+              <button
+                disabled
+                className="px-6 py-2 bg-gray-500 rounded font-semibold cursor-not-allowed opacity-70"
+              >
+                No Trailer Available
               </button>
             )}
 
@@ -160,15 +163,15 @@ const MovieDetails = () => {
         </div>
       )}
 
-{copied && (
-  <div className="fixed bottom-6 right-6 bg-black text-white px-4 py-2 rounded-lg shadow-lg">
-    Link copied!
-  </div>
-)}
+      {copied && (
+        <div className="fixed bottom-6 right-6 bg-black text-white px-4 py-2 rounded-lg shadow-lg">
+          Link copied!
+        </div>
+      )}
 
     </div>
   )
-  
+
 };
 
 export default MovieDetails;

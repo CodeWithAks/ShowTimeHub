@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import MovieCard from "../components/MovieCard";
-import { getPopularmovies,searchMovies,getMovieTrailer,} from "../services/api";
+import { getPopularmovies, searchMovies, getMovieTrailer, getTopRatedMovies, getMoviesByGenre } from "../services/api";
 import { useMovieContext } from "../contexts/MovieContext";
 import { useTheme } from "../contexts/ThemeContext";
 import SkeletonCard from "../components/SkeletonCards.jsx";
-import  {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const { darkMode } = useTheme();
@@ -18,9 +18,49 @@ const Home = () => {
   const [trailer, setTrailer] = useState(null);
   const [showTrailer, setShowTrailer] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-  const [heroIndex, setHeroIndex] = useState(0); 
+  const [heroIndex, setHeroIndex] = useState(0);
 
   const navigate = useNavigate();
+
+  // Fetch movies based on filter (only when not searching)
+  useEffect(() => {
+    if (isSearching) return; // Skip if user is searching
+
+    const fetchMoviesByFilter = async () => {
+      setLoading(true);
+      try {
+        let results;
+
+        if (filter === "All") {
+          results = await getPopularmovies();
+        } else if (filter === "Top Rated") {
+          results = await getTopRatedMovies();
+        } else {
+          // Genre-based fetch
+          const genreMap = {
+            Action: 28,
+            Comedy: 35,
+            Horror: 27,
+            Romance: 10749,
+            Thriller: 53,
+          };
+
+          results = genreMap[filter]
+            ? await getMoviesByGenre(genreMap[filter])
+            : await getPopularmovies();
+        }
+
+        setMovies(results);
+        setError(null);
+      } catch {
+        setError("Failed to load movies...");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMoviesByFilter();
+  }, [filter, isSearching]);
 
   //banner
   useEffect(() => {   //
@@ -35,28 +75,14 @@ const Home = () => {
 
   //debounced search
   useEffect(() => {
-  const timeout = setTimeout(() => {
-    if (searchQuery.trim()) {
-      handleSearch();
-    }
-  }, 500);
-
-  return () => clearTimeout(timeout);
-}, [searchQuery]);
-
-  useEffect(() => {
-    const loadPopularMovies = async () => {
-      try {
-        const popular = await getPopularmovies();
-        setMovies(popular);
-      } catch {
-        setError("Failed to load movies...");
-      } finally {
-        setLoading(false);
+    const timeout = setTimeout(() => {
+      if (searchQuery.trim()) {
+        handleSearch();
       }
-    };
-    loadPopularMovies();
-  }, []);
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [searchQuery]);
 
   useEffect(() => {
     if (!selectedMovie) return;
@@ -94,31 +120,7 @@ const Home = () => {
   const clearSearch = async () => {
     setSearchQuery("");
     setIsSearching(false);
-    setLoading(true);
-
-    const popular = await getPopularmovies();
-    setMovies(popular);
-    setLoading(false);
   };
-
-  const filteredMovies = movies.filter((movie) => {
-    if (filter === "All") return true;
-    if (filter === "Top Rated") return parseFloat(movie.vote_average.toFixed(1)) >= 8;
-
-    const genreMap = {
-      Action: 28,
-      Comedy: 35,
-      Horror: 27,
-      Romance: 10749,
-      Thriller: 53,
-    };
-
-    if (genreMap[filter]) {
-      return movie.genre_ids.includes(genreMap[filter]);
-    }
-
-    return true;
-  });
 
   return (
     <div
@@ -149,8 +151,8 @@ const Home = () => {
           {/* Dark/Light mode */}
           <div
             className={`absolute inset-0 ${darkMode
-                ? "bg-gradient-to-r from-black via-black/60 to-transparent"
-                : "bg-gradient-to-r from-white via-white/5 to-transparent"
+              ? "bg-gradient-to-r from-black via-black/60 to-transparent"
+              : "bg-gradient-to-r from-white via-white/5 to-transparent"
               }`}
           />
 
@@ -179,8 +181,8 @@ const Home = () => {
 
               <button
                 className={`px-6 py-3 rounded-xl border transition ${darkMode
-                    ? "border-white/30 hover:bg-white/10 text-white"
-                    : "border-black/20 hover:bg-black/5 text-black"
+                  ? "border-white/30 hover:bg-white/10 text-white"
+                  : "border-black/20 hover:bg-black/5 text-black"
                   }`}>
                 + My List
               </button>
@@ -192,7 +194,7 @@ const Home = () => {
             {movies.slice(0, 5).map((_, index) => (
               <div
                 key={index}
-                className={`h-1 w-6 rounded-full transition ${index === heroIndex ? "bg-amber-500" : darkMode ? "bg-white/30" : "bg-black/30" }`}/>
+                className={`h-1 w-6 rounded-full transition ${index === heroIndex ? "bg-amber-500" : darkMode ? "bg-white/30" : "bg-black/30"}`} />
             ))}
           </div>
         </motion.div>
@@ -208,7 +210,7 @@ const Home = () => {
           type="text"
           placeholder="Search movies, actors, genres..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}/>
+          onChange={(e) => setSearchQuery(e.target.value)} />
 
 
         <button type="submit" className="bg-gradient-to-r from-amber-400 to-amber-600 px-6 py-3 rounded-xl font-semibold shadow-lg hover:scale-105 active:scale-95 transition w-full sm:w-auto" >
@@ -221,23 +223,24 @@ const Home = () => {
       {/* Movies */}
       {loading ? (
         <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-  {Array.from({ length: 10 }).map((_, index) => (
-    <SkeletonCard key={index} />
-  ))}
-</div>
+          {Array.from({ length: 10 }).map((_, index) => (
+            <SkeletonCard key={index} />
+          ))}
+        </div>
       ) : (
         <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-          {filteredMovies.map((movie) => (
+          {movies.map((movie) => (
             <motion.div
               key={movie.id}
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.97 }}
               transition={{ type: "spring", stiffness: 300 }}
-              // onClick={() => setSelectedMovie(movie)}
-              onClick={() => navigate(`/movie/${movie.id}`)}
               className="cursor-pointer"
             >
-              <MovieCard movie={movie} />
+              <MovieCard
+                movie={movie}
+                onCardClick={() => navigate(`/movie/${movie.id}`)}
+              />
             </motion.div>
           ))}
         </div>

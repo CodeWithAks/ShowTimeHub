@@ -1,6 +1,5 @@
 import { useMovieContext } from "../contexts/MovieContext";
-
-function MovieCard({ movie }) {
+function MovieCard({ movie, onCardClick }) {
   const { isFavourite, addToFavourites, removeFromFavourites } = useMovieContext();
   const favourite = isFavourite(movie.id); //checking if the movie favourite
 
@@ -13,7 +12,10 @@ function MovieCard({ movie }) {
   };
 
   return (
-    <div className="p-2 sm:p-3 md:p-4 flex flex-col justify-between hover:bg-zinc-800/50 rounded-xl transition-colors duration-200">
+    <div
+  onClick={onCardClick}
+  className="p-2 sm:p-3 md:p-4 flex flex-col justify-between hover:bg-zinc-800/50 rounded-xl transition-colors duration-200 cursor-pointer"
+>
       {/* Poster */}
       <div className="relative w-full aspect-[2/3] flex items-center justify-center mb-4">
         <img
